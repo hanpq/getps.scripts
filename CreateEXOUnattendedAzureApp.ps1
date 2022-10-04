@@ -123,7 +123,6 @@ Write-Verbose 'Added role assignment'
 if ($PassThru)
 {
     Write-Output ([pscustomobject]$ResultObjectHash)
-    Remove-Variable ResultObjectHash -ErrorAction SilentlyContinue
 }
 else
 {
@@ -137,5 +136,6 @@ else
     Write-Host ''
 }
 
+Remove-Variable ResultObjectHash -ErrorAction SilentlyContinue
 
 
