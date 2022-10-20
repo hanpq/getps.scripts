@@ -1,1 +1,4 @@
+
 # getps.script
+
+ test
