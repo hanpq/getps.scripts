@@ -1,4 +1,4 @@
 
 # getps.script
 
-# test
+Public script repository for getps.dev
