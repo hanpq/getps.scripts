@@ -47,7 +47,7 @@ PSScriptInfo#>
     .PARAMETER PageSize
         Optionally specify the PageSize when retreiving repos and artifacts. Valid values are in range of 1..100. Default is 30.
     .LINK
-        Specify a URI to a help page, this will show when Get-Help -Online is used.
+        https://getps.dev/blog/cleanup-github-artifacts
     .EXAMPLE
         .\CleanupGitHubArtifacts.ps1 -GitHubSecret "ABC" -GitHubOrg "user"
 
