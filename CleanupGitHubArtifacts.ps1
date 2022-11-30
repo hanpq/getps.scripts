@@ -57,6 +57,7 @@ PSScriptInfo#>
 
         Running the script with a specified repo will cleanup all artifacts for that repo
 #>
+[CmdletBinding(SupportsShouldProcess)]
 param(
     [parameter(Mandatory)]
     [string]
@@ -132,8 +133,11 @@ foreach ($Repo in $Repos)
         $ObjectHash.Artifacts_SizeMB = (($Artifacts | Measure-Object -Sum -Property size_in_bytes).Sum / 1MB)
         foreach ($artifact in $artifacts)
         {
-            $Result = Invoke-RestMethod -Method DELETE -Uri "https://api.github.com/repos/$GitHubOrg/$($Repo.Name)/actions/artifacts/$($artifact.id)"
-            $ObjectHash.Artifact_Removed++
+            if ($PSCmdlet.ShouldProcess("Artifact: $($artifact.name) in Repo: $($Repo.Name)", 'DELETE'))
+            {
+                $Result = Invoke-RestMethod -Method DELETE -Uri "https://api.github.com/repos/$GitHubOrg/$($Repo.Name)/actions/artifacts/$($artifact.id)"
+                $ObjectHash.Artifact_Removed++
+            }
         }
     }
 
