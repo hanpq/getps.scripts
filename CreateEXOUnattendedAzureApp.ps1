@@ -67,7 +67,7 @@ $ResultObjectHash = [ordered]@{
     CertificateCERPath  = (Join-Path -Path $OutputDirectory -ChildPath "$Organization.cer")
 }
 
-$null = Connect-Graph -Scopes 'Application.ReadWrite.All', 'RoleManagement.ReadWrite.Directory'
+$null = Connect-Graph -Scopes 'Application.ReadWrite.All', 'RoleManagement.ReadWrite.Directory' -TenantId $Organization
 
 $ResultObjectHash.Certificate = New-SelfSignedCertificate -DnsName $ResultObjectHash.Organization -CertStoreLocation 'cert:\CurrentUser\My' -NotAfter (Get-Date).AddYears(1) -KeySpec KeyExchange -FriendlyName $AppName
 Write-Verbose "Created self-signed certificate with thumbprint: $($ResultObjectHash.Certificate.Thumbprint)"
@@ -115,6 +115,10 @@ $ResultObjectHash.ServicePrincipal = New-MgServicePrincipal -AppId $ResultObject
 
 Write-Verbose 'Waiting 60 seconds for Azure app to be provisioned...'
 Start-Sleep -Seconds 60
+Write-Host ''
+Write-Host '   If a webbrowser does not open, paste the following link into a web browser manually'
+Write-Host "https://login.microsoftonline.com/$($ResultObjectHash.Organization)/adminconsent?client_id=$($ResultObjectHash.AzureAppRegistration.Appid)"
+Write-Host ''
 Start-Process "https://login.microsoftonline.com/$($ResultObjectHash.Organization)/adminconsent?client_id=$($ResultObjectHash.AzureAppRegistration.Appid)"
 $null = Read-Host '   Press enter once consent has been given'
 
