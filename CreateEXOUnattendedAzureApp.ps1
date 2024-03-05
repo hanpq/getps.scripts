@@ -42,10 +42,48 @@ param (
 
 $ErrorActionPreference = 'Stop'
 
-$SavedVerbosePreference = $VerbosePreference
-$VerbosePreference = 'SilentlyContinue'
-Import-Module Microsoft.Graph.Applications, Microsoft.Graph.Authentication, Microsoft.Graph.DeviceManagement.Enrolment -Verbose:$false
-$VerbosePreference = $SavedVerbosePreference
+
+
+$ImportModules = @('PKI', 'Microsoft.Graph.Authentication', 'Microsoft.Graph.Applications', 'Microsoft.Graph.DeviceManagement.Enrollment', 'Microsoft.Graph.Identity.Governance')
+foreach ($Module in $ImportModules)
+{
+    try
+    {
+        Write-Verbose "Importing module $Module"
+        $SavedVerbosePreference = $VerbosePreference
+        $VerbosePreference = 'SilentlyContinue'
+        switch ($Module)
+        {
+            'PKI'
+            {
+                Import-Module $Module -Force -Verbose:$false -ErrorAction Stop -Cmdlet 'New-SelfSignedCertificate', 'Export-PfxCertificate', 'Export-Certificate'
+            }
+            'Microsoft.Graph.Identity.Governance'
+            {
+                Import-Module $Module -Force -Verbose:$false -ErrorAction Stop -MinimumVersion 2.15.0 -Cmdlet 'New-MgRoleManagementDirectoryRoleAssignment'
+            }
+            'Microsoft.Graph.Authentication'
+            {
+                Import-Module $Module -Force -Verbose:$false -ErrorAction Stop -MinimumVersion 2.15.0 -Cmdlet 'Connect-Graph'
+            }
+            'Microsoft.Graph.Applications'
+            {
+                Import-Module $Module -Force -Verbose:$false -ErrorAction Stop -MinimumVersion 2.15.0 -Cmdlet 'New-MgApplication', 'New-MgServicePrincipal'
+            }
+            default
+            {
+                Import-Module $Module -Force -Verbose:$false -ErrorAction Stop
+            }
+        }
+        $VerbosePreference = $SavedVerbosePreference
+        Write-Verbose "Imported module $Module"
+    }
+    catch
+    {
+        Write-Error "Failed to import module $Module with error: $_" -ErrorAction Stop
+    }
+}
+
 
 function Get-RandomPassword
 {
@@ -113,7 +151,7 @@ Write-Verbose "Created Azure App: $($ResultObjectHash.AppName)"
 
 $ResultObjectHash.ServicePrincipal = New-MgServicePrincipal -AppId $ResultObjectHash.AzureAppRegistration.AppId
 
-Write-Verbose 'Waiting 60 seconds for Azure app to be provisioned...'
+Write-Host 'Waiting 60 seconds for Azure app to be provisioned...'
 Start-Sleep -Seconds 60
 Write-Host ''
 Write-Host '   If a webbrowser does not open, paste the following link into a web browser manually'
@@ -138,6 +176,7 @@ else
     Write-Host ''
     Write-Host '   NOTE: Restart powershell before connecting to Exchange Online' -ForegroundColor Yellow
     Write-Host '   NOTE: It could take some time before the added roles are effective. If you get an error regarding missing permissions, please wait a minute and try again.' -ForegroundColor Yellow
+    Write-Host '   NOTE: Password for the pfx file is (write it down) ' -NoNewline -ForegroundColor Yellow; Write-Host $ResultObjectHash.CertificatePassword -ForegroundColor Magenta
     Write-Host ''
 }
 
