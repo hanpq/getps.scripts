@@ -30,4 +30,4 @@ Install-Module PSSQLite -Scope CurrentUSer
 
 ## Credits
 
-This script is based on the work of [basnijholt](https://github.com/basnijholt) who have made a [pearl script](https://github.com/basnijholt/iOSMessageExport) that does a full message export to a HTML page. I was only intrested in the files and not very well versed in pearl so based on the logic in his script I converted it to a powershell script. I hope someone finds it useful.
+This script is based on the work of [basnijholt](https://github.com/basnijholt) who have made a [pearl script](https://github.com/basnijholt/iOSMessageExport) that does a full message export to a HTML page. I was only interested in the files and not very well versed in pearl so based on the logic in his script I converted it to a powershell script. I hope someone finds it useful.
